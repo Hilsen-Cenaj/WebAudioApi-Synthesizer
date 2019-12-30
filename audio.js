@@ -1,47 +1,45 @@
 
-
+var myAudioContext;
+var oscillator;
 function audioSetup() {
 	// Variables
 	var frequencyLabel;
 	var volumeLabel;
 	var start_button = document.getElementById('start');
 
-	var myAudioContext = window.AudioContext || window.webkitAudioContext;
-	var oscillator;
+	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+	
 	var gainNode;
-
-	// Notes
-	var lowNote = 261.63; // C4
-	var highNote = 493.88; // B4
+	
+	var state="stopped";
 	
 	
-	oscillator = myAudioContext.createOscillator();
-    gainNode = myAudioContext.createGainNode();
-  
-    oscillator.type = 'triangle';
-	oscillator.frequency.setValueAtTime(440, myAudioContext.currentTime); // value in hertz
-  
-    gainNode.connect(myAudioContext.destination);
-    oscillator.connect(gainNode);
-	oscillator.start(0);
+    //gainNode = myAudioContext.createGainNode();
   
     
-	//Button 
-    start_button.addEventListener('click', function () {
-		if (songPlaying) {
-		  start_button.innerHTML = 'Start Audio';
-		  oscillator.start(0);
-		} else {
-		  song.play();
-		  drawOscilloscope();
-		  updateWaveForm();
-		  start_button.innerHTML = 'Stop Audio';
-		  oscillator.stop(0);
+  
+    //gainNode.connect(myAudioContext.destination);
+    
+	
+	//Play/Stop Button
+	start_button.addEventListener('click', function() {
+	  if (myAudioContext.state === 'suspended') {
+		   myAudioContext.resume();
+	   }
+		if(state==="stopped"){
+			oscillator = myAudioContext.createOscillator();
+			oscillator.type = 'triangle';
+			oscillator.connect(myAudioContext.destination);
+			oscillator.start();
+			state="playing";
+		}else{
+			oscillator.stop(myAudioContext.currentTime +0.5);
+			oscillator.disconnect(myAudioContext.destination);
+			state="stopped";
+			delete oscillator
 		}
-
-		songPlaying = !songPlaying;
-	});
-})();
+	},false);
+};
 
 
 audioSetup();
@@ -50,8 +48,8 @@ audioSetup();
 // Create Wave Form
 // ========================================================
 
-const analyser = audioContext.createAnalyser();
-masterGain.connect(analyser);
+const analyser = myAudioContext.createAnalyser();
+oscillator.connect(analyser);
 
 const waveform = new Float32Array(analyser.frequencyBinCount);
 analyser.getFloatTimeDomainData(waveform);
