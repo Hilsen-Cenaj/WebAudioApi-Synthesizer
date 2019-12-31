@@ -1,7 +1,7 @@
 
 var myAudioContext;
 var oscillator,gainNode,analyser;
-
+var new;
 var state="stopped";
 var start_button = document.getElementById('start');
 function audioSetup() {
@@ -12,7 +12,7 @@ function audioSetup() {
 	analyser = myAudioContext.createAnalyser();
 	oscillator = myAudioContext.createOscillator();
 	oscillator.type = 'triangle';
-oscillator.start();
+	oscillator.start();
 	oscillator.connect(gainNode);
 	gainNode.connect(analyser);
   analyser.connect(myAudioContext.destination);
