@@ -43,7 +43,7 @@ body {
   position: relative;
   z-index: 1;
   font-family: 'Roboto', sans-serif;
-  font-size: 0.875rem;
+  font-size: 14px;
   background: #5FA0FB;
   color: white;
 }
@@ -51,6 +51,12 @@ body {
   cursor: pointer;
 }
 
+p,.osc-type,.frequency,.frequency_value{
+  font-family: sans-serif;
+  font-size: 14px;
+  position: relative;
+  margin-left: 10px;
+}
 #oscilloscope {
   border-top: 4px solid #e6ebf1;
   border-bottom: 4px solid #e6ebf1;
@@ -59,4 +65,89 @@ body {
   background-color: #040d7f;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-position: -35px 95%;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 6.55px 4px;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+
+  height: 5.9px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  background: #0008d1;
+  border-radius: 16.2px;
+  border: 0px solid #000101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1.4px 1.4px 3.3px #000000, 0px 0px 1.4px #0d0d0d;
+  border: 1px solid #000000;
+  height: 19px;
+  width: 21px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6.55px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #0008d1;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 5.9px;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+  background: #0008d1;
+  border-radius: 16.2px;
+  border: 0px solid #000101;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1.4px 1.4px 3.3px #000000, 0px 0px 1.4px #0d0d0d;
+  border: 1px solid #000000;
+  height: 19px;
+  width: 21px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 5.9px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #0008d1;
+  border: 0px solid #000101;
+  border-radius: 32.4px;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #0008d1;
+  border: 0px solid #000101;
+  border-radius: 32.4px;
+  box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 1.4px 1.4px 3.3px #000000, 0px 0px 1.4px #0d0d0d;
+  border: 1px solid #000000;
+  height: 19px;
+  width: 21px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+  height: 5.9px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #0008d1;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #0008d1;
 }

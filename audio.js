@@ -1,9 +1,9 @@
 
 var myAudioContext;
 var oscillator,gainNode,analyser;
-var new;
 var state="stopped";
 var start_button = document.getElementById('start');
+var frequency_value = document.getElementById('valuefreq');
 function audioSetup() {
 
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -35,7 +35,14 @@ start_button.addEventListener('click', function() {
 
 	}
 },false);
+function changeType(type){
+	oscillator.type=type;
+}
 
+ function changeFrequency(frequency){
+	 oscillator.frequency.value=frequency;
+	 frequency_value.innerHTML=frequency;
+ }
 audioSetup();
 
 // ========================================================
