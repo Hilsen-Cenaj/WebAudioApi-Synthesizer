@@ -1,67 +1,57 @@
 
 var myAudioContext;
-var oscillator;
+var oscillator,gainNode,analyser;
+
+var state="stopped";
+var start_button = document.getElementById('start');
 function audioSetup() {
-	// Variables
-	var frequencyLabel;
-	var volumeLabel;
-	var start_button = document.getElementById('start');
 
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-	
-	var gainNode;
-	
-	var state="stopped";
-	
-	
-    //gainNode = myAudioContext.createGainNode();
-  
-    
-  
-    //gainNode.connect(myAudioContext.destination);
-    
-	
-	//Play/Stop Button
-	start_button.addEventListener('click', function() {
-	  if (myAudioContext.state === 'suspended') {
-		   myAudioContext.resume();
-	   }
-		if(state==="stopped"){
-			oscillator = myAudioContext.createOscillator();
-			oscillator.type = 'triangle';
-			oscillator.connect(myAudioContext.destination);
-			oscillator.start();
-			state="playing";
-		}else{
-			oscillator.stop(myAudioContext.currentTime +0.5);
-			oscillator.disconnect(myAudioContext.destination);
-			state="stopped";
-			delete oscillator
-		}
-	},false);
+
+  gainNode = myAudioContext.createGain();
+	analyser = myAudioContext.createAnalyser();
+	oscillator = myAudioContext.createOscillator();
+	oscillator.type = 'triangle';
+oscillator.start();
+	oscillator.connect(gainNode);
+	gainNode.connect(analyser);
+  analyser.connect(myAudioContext.destination);
+
 };
 
+//Play/Stop Button
+start_button.addEventListener('click', function() {
+	if (myAudioContext.state === 'suspended') {
+		 myAudioContext.resume();
+	 }
+	if(state==="stopped"){
+		gainNode.gain.value=1;
+		start_button.innerHTML="Stop Oscillator"
+		state="playing";
+	}else{
+		gainNode.gain.value=0;
+		state="stopped";
+		start_button.innerHTML="Start Oscillator"
+
+	}
+},false);
 
 audioSetup();
 
 // ========================================================
 // Create Wave Form
 // ========================================================
-
-const analyser = myAudioContext.createAnalyser();
-oscillator.connect(analyser);
-
+var canvas = document.querySelector('.visualizer');
+var myCanvas = canvas.getContext("2d");
+analyser.fftSize = 1024;
 const waveform = new Float32Array(analyser.frequencyBinCount);
 analyser.getFloatTimeDomainData(waveform);
+
 
 function updateWaveForm() {
   requestAnimationFrame(updateWaveForm);
   analyser.getFloatTimeDomainData(waveform);
 }
-
-// ========================================================
-// Draw Oscilloscope
-// ========================================================
 
 function drawOscilloscope() {
   requestAnimationFrame(drawOscilloscope);
@@ -91,3 +81,6 @@ function drawOscilloscope() {
   scopeContext.lineWidth = 2;
   scopeContext.stroke();
 }
+
+drawOscilloscope();
+updateWaveForm();
