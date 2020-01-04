@@ -3,16 +3,23 @@
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="style.css">
-
+		
 	</head>
 	<body>
 		<div class="audio-viz">
 			<h1 class="title">WebAudio Synthesizer</h1>
 
 			<canvas class="visualizer" id="oscilloscope"></canvas>
-			<button class="audio-btn" id="start">Start Oscillator</button>
+			<button class="audio-btn" id="start">Start Audio</button>
 		</div>
-
+		<div class = "slidercontainer">
+			<p><label for="volume">Volume</label></p>
+			<p><input type="range" id="volume" min="0" max="100" class="slider"></p>
+		</div>
+		<div class = "slidercontainer">
+			<p><label for="frequency">Frequaency</label></p>
+			<p><input type="range" id="frequency" min="0" max="100" class="slider"></p>
+		</div>
 		<script src="audio.js"></script>
 	</body>
 </html>
