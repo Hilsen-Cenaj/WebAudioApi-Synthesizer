@@ -12,13 +12,25 @@
 			<canvas class="visualizer" id="oscilloscope"></canvas>
 			<button class="audio-btn" id="start">Start Audio</button>
 		</div>
+		<div class="osc-type">
+			<p>
+			<input type="radio" name="ir" value="0" class="effect" checked
+			onclick="changeType('sine')">Sine</input>
+			<input type="radio" name="ir" value="1" class="effect"
+			onclick="changeType('square')">Square</input>
+			<input type="radio" name="ir" value="2" class="effect"
+			onclick="changeType('sawtooth')">Sawtooth</input>
+			<input type="radio" name="ir" value="3" checked class="effect"
+			onclick="changeType('triangle')">Triangle</input>
+			</p>
+		</div>
 		<div class = "slidercontainer">
 			<p><label for="volume">Volume</label></p>
 			<p><input type="range" id="volume" min="0" max="100" class="slider"></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="frequency">Frequaency</label></p>
-			<p><input type="range" id="frequency" min="0" max="100" class="slider"></p>
+			<p><label for="frequency">Frequency</label></p>
+			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" class="slider"></p>
 		</div>
 		<script src="audio.js"></script>
 	</body>

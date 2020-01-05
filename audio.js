@@ -3,7 +3,7 @@
 // ========================================================
 const volumeButton = document.getElementById('volume');
 const start_button = document.getElementById('start');
-const frequency_button = document.getElementById('frequency');
+const frequency_value = document.getElementById('frequency');
 
 var myAudioContext;
 var oscillator, analyser, gainNode;
@@ -12,7 +12,6 @@ var state="stopped";
 
 function audioSetup() {
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-
 	gainNode = myAudioContext.createGain();
 	analyser = myAudioContext.createAnalyser();
 	oscillator = myAudioContext.createOscillator();
@@ -42,6 +41,23 @@ start_button.addEventListener('click', function() {
 	}
 },false);
 
+// ========================================================
+// Change Type
+// ========================================================
+function changeType(type){
+	oscillator.type=type;
+}
+
+// ========================================================
+// Frequecy Bar
+// ========================================================
+function changeFrequency(frequency){
+	oscillator.frequency.value=frequency;
+	frequency_value.innerHTML=frequency;
+}
+
+
+
 audioSetup();
 
 // ========================================================
@@ -49,13 +65,6 @@ audioSetup();
 // ========================================================
 volumeButton.addEventListener('input',function(){	
 	gainNode.gain.value=this.value/100;
-},false);
-
-// ========================================================
-// Frequecy Bar
-// ========================================================
-frequency_button.addEventListener('input',function(){
-	oscillator.frequency.value()
 },false);
 
 // ========================================================
