@@ -7,27 +7,37 @@
 	</head>
 	<body>
 		<div class="audio-viz">
+
 			<h1 class="title">WebAudio Synthesizer</h1>
+			<img class="image" src="KEYBOARD.jpg" align="right" >
+			<h3 >Please use your keyboard to play notes
+				as shown in the picture </h3>
 
 			<canvas class="visualizer" id="oscilloscope"></canvas>
-			<button class="audio-btn" id="start">Start Oscillator</button>
-			<p>Type</p>
-			<div class="osc-type">
-				<input type="radio" name="ir" value="0" class="effect" checked
-				onclick="changeType('sine')">Sine</input>
-				<input type="radio" name="ir" value="1" class="effect"
-				onclick="changeType('square')">Square</input>
-				<input type="radio" name="ir" value="2" class="effect"
-				onclick="changeType('sawtooth')">Sawtooth</input>
-				<input type="radio" name="ir" value="3" checked class="effect"
-				onclick="changeType('triangle')">Triangle</input>
-			</div>
-			<p>Frequency</p>
-			<input type="range" id="frequency" min="0" max="1000"
-			 step="1" value="440" oninput="changeFrequency(value)"><p id="valuefreq" style="display:inline" >      440</p>
+
+			<button class="audio-btn" id="start">Start Audio</button>
+		</div>
+		<div class="osc-type">
+			<p>
+			<input type="radio" name="ir" value="0" class="effect" checked
+			onclick="changeType('sine')">Sine</input>
+			<input type="radio" name="ir" value="1" class="effect"
+			onclick="changeType('square')">Square</input>
+			<input type="radio" name="ir" value="2" class="effect"
+			onclick="changeType('sawtooth')">Sawtooth</input>
+			<input type="radio" name="ir" value="3" checked class="effect"
+			onclick="changeType('triangle')">Triangle</input>
+			</p>
+		</div>
+		<div class = "slidercontainer">
+			<p><label for="volume">Volume</label></p>
+			<p><input type="range" id="volume" min="0" max="100" class="slider"></p>
+		</div>
+		<div class = "slidercontainer">
+			<p><label for="frequency">Frequency</label></p>
+			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" class="slider"></p>
 
 		</div>
-
 		<script src="audio.js"></script>
 	</body>
 </html>

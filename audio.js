@@ -1,42 +1,112 @@
+// ========================================================
+// Global Variables
+// ========================================================
+const volumeButton = document.getElementById('volume');
+const start_button = document.getElementById('start');
+const frequency_value = document.getElementById('frequency');
 
 var myAudioContext;
-var oscillator,gainNode,analyser;
+var oscillator,gainNode,analyser,vcf,vca;
 var state="stopped";
-var start_button = document.getElementById('start');
-var frequency_value = document.getElementById('valuefreq');
+var typeOscillator='triangle';
+var activeNotes={};
+
+
+//KEYCODE TO MUSICAL FREQUENCY CONVERSION
+  const keyboardFrequencyMap = {
+    '90': 261.625565300598634,  //Z - C
+    '83': 277.182630976872096, //S - C#
+    '88': 293.664767917407560,  //X - D
+    '68': 311.126983722080910, //D - D#
+    '67': 329.627556912869929,  //C - E
+    '86': 349.228231433003884,  //V - F
+    '71': 369.994422711634398, //G - F#
+    '66': 391.995435981749294,  //B - G
+    '72': 415.304697579945138, //H - G#
+    '78': 440.000000000000000,  //N - A
+    '74': 466.163761518089916, //J - A#
+    '77': 493.883301256124111,  //M - B
+    '81': 523.251130601197269,  //Q - C
+    '50': 554.365261953744192, //2 - C#
+    '87': 587.329535834815120,  //W - D
+    '51': 622.253967444161821, //3 - D#
+    '69': 659.255113825739859,  //E - E
+    '82': 698.456462866007768,  //R - F
+    '53': 739.988845423268797, //5 - F#
+    '84': 783.990871963498588,  //T - G
+    '54': 830.609395159890277, //6 - G#
+    '89': 880.000000000000000,  //Y - A
+    '55': 932.327523036179832, //7 - A#
+    '85': 987.766602512248223,  //U - B
+  }
+window.addEventListener('keydown',keyDown,false);
+window.addEventListener('keyup',keyUp,false);
+
+function keyDown(event){
+	const note=(event.detail || event.which).toString();
+	if(!activeNotes[note] && keyboardFrequencyMap[note]){
+		playNote(note)
+	}
+}
+
+function keyUp(event){
+	const note=(event.detail || event.which).toString();
+	if(activeNotes[note] && keyboardFrequencyMap[note]){
+		activeNotes[note].stop();
+		delete activeNotes[note];
+	}
+}
+
+function playNote(note){
+	var osc=myAudioContext.createOscillator();
+	osc.type=typeOscillator;
+	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
+	activeNotes[note]=osc;
+	activeNotes[note].connect(gainNode);
+	activeNotes[note].start();
+
+
+}
 function audioSetup() {
-
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-  gainNode = myAudioContext.createGain();
+	gainNode = myAudioContext.createGain();
 	analyser = myAudioContext.createAnalyser();
-	oscillator = myAudioContext.createOscillator();
-	oscillator.type = 'triangle';
-	oscillator.start();
-	oscillator.connect(gainNode);
+	vcf=myAudioContext.createBiquadFilter();
+	vca=myAudioContext.createGain();
 	gainNode.connect(analyser);
-  analyser.connect(myAudioContext.destination);
+	analyser.connect(myAudioContext.destination);
 
 };
 
-//Play/Stop Button
+// ========================================================
+// Start/Stop Button
+// ========================================================
 start_button.addEventListener('click', function() {
 	if (myAudioContext.state === 'suspended') {
 		 myAudioContext.resume();
 	 }
 	if(state==="stopped"){
-		gainNode.gain.value=1;
-		start_button.innerHTML="Stop Oscillator"
+		oscillator = myAudioContext.createOscillator();
+		oscillator.type = typeOscillator;
+		oscillator.start();
+		oscillator.connect(gainNode);
+		start_button.innerHTML="Stop Audio";
 		state="playing";
 	}else{
-		gainNode.gain.value=0;
+		oscillator.stop();
+		delete oscillator
 		state="stopped";
-		start_button.innerHTML="Start Oscillator"
-
+		start_button.innerHTML="Start Audio";
 	}
 },false);
+
+
+
 function changeType(type){
-	oscillator.type=type;
+	typeOscillator=type;
+	if(oscillator){
+		oscillator.type=type;
+	}
 }
 
  function changeFrequency(frequency){
@@ -46,47 +116,58 @@ function changeType(type){
 audioSetup();
 
 // ========================================================
+// Volume Bar
+// ========================================================
+volumeButton.addEventListener('input',function(){
+	gainNode.gain.value=this.value/100;
+},false);
+
+// ========================================================
 // Create Wave Form
 // ========================================================
+
 var canvas = document.querySelector('.visualizer');
 var myCanvas = canvas.getContext("2d");
 analyser.fftSize = 1024;
+
 const waveform = new Float32Array(analyser.frequencyBinCount);
 analyser.getFloatTimeDomainData(waveform);
-
 
 function updateWaveForm() {
   requestAnimationFrame(updateWaveForm);
   analyser.getFloatTimeDomainData(waveform);
 }
 
+// ========================================================
+// Draw Oscilloscope
+// ========================================================
+
 function drawOscilloscope() {
-  requestAnimationFrame(drawOscilloscope);
+	requestAnimationFrame(drawOscilloscope);
 
-  const scopeCanvas = document.getElementById('oscilloscope');
-  const scopeContext = scopeCanvas.getContext('2d');
+	const scopeCanvas = document.getElementById('oscilloscope');
+	const scopeContext = scopeCanvas.getContext('2d');
 
-  scopeCanvas.width = waveform.length;
-  scopeCanvas.height = 200;
+	scopeCanvas.width = waveform.length;
+	scopeCanvas.height = 200;
 
-  scopeContext.clearRect(0, 0, scopeCanvas.width, scopeCanvas.height);
-  scopeContext.beginPath();
+	scopeContext.clearRect(0, 0, scopeCanvas.width, scopeCanvas.height);
+	scopeContext.beginPath();
 
-  for (let i = 0; i < waveform.length; i++) {
-    const x = i;
-    const y = (0.5 + waveform[i] / 2) * scopeCanvas.height;
+	for (let i = 0; i < waveform.length; i++) {
+		const x = i;
+		const y = (0.5 + waveform[i] / 2) * scopeCanvas.height;
 
+		if (i == 0) {
+		  scopeContext.moveTo(x, y);
+		} else {
+		  scopeContext.lineTo(x, y);
+		}
+	}
 
-    if (i == 0) {
-      scopeContext.moveTo(x, y);
-    } else {
-      scopeContext.lineTo(x, y);
-    }
-  }
-
-  scopeContext.strokeStyle = '#5661FA';
-  scopeContext.lineWidth = 2;
-  scopeContext.stroke();
+	scopeContext.strokeStyle = '#5661FA';
+	scopeContext.lineWidth = 2;
+	scopeContext.stroke();
 }
 
 drawOscilloscope();
