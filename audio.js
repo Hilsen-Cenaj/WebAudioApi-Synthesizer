@@ -9,8 +9,9 @@ const freq_text=document.getElementById('freq_value');
 const cutoff_text=document.getElementById('cutoff_value');
 const peak_text=document.getElementById('peak_value');
 const vcf_button=document.getElementById('vcf');
+const lfo_button=document.getElementById('lfo');
 var myAudioContext;
-
+var typeLFO=0;//1->Tremolo,2->Vibrato,3->Wah,wah
 var oscillator,gainNode,analyser,vcf,vca,lfo,osc;
 var state="stopped";
 var typeOscillator='triangle';
@@ -60,24 +61,22 @@ function keyUp(event){
 		activeNotes[note].stop();
 		activeNotes[note].disconnect(vcf);
 		activeNotes[note].disconnect(gainNode);
-    //lfo.stop();
-    //delete lfo;
+    	
 		delete activeNotes[note];
 	}
 }
 
 function playNote(note){
-  lfo=myAudioContext.createOscillator();
-  //lfo.connect(gainNode.gain);
+
 	osc=myAudioContext.createOscillator();
 	osc.type=typeOscillator;
 	osc.connect(vcf);
-  //lfo.frequency.setValueAtTime(5,myAudioContext.currentTime);
-	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
 	activeNotes[note]=osc;
 	activeNotes[note].connect(gainNode);
+	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
+
 	activeNotes[note].start();
-  //lfo.start();
+
 }
 
 function audioSetup() {
@@ -96,6 +95,24 @@ function audioSetup() {
 
 };
 
+function changeLFOtype(type){
+	if(type==="Tremolo"){
+		typeLFO=1;
+		tremolo();
+	}else if(type==="Vibrato"){
+		typeLFO=2;
+		if(oscillator){
+			vibrato(oscillator);
+		}
+		if(osc){
+			vibrato(osc);
+		}
+	}else if(type==="Wah Wah"){
+		typeLFO=3;
+	}
+	
+}
+
 
 // ========================================================
 // Start/Stop Button
@@ -105,28 +122,27 @@ start_button.addEventListener('click', function() {
 		 myAudioContext.resume();
 	 }
 	if(state==="stopped"){
-    lfo=myAudioContext.createOscillator();
-    //lfo.connect(gainNode.gain);
+		
 		oscillator = myAudioContext.createOscillator();
 		oscillator.type = typeOscillator;
-    //lfo.frequency.setValueAtTime(1,myAudioContext.currentTime);
+		
 		oscillator.start();
-    //lfo.start();
+    	
 		oscillator.connect(vcf);
 		oscillator.connect(gainNode);
 
 		start_button.innerHTML="Stop Audio";
 		state="playing";
 	}else{
-    vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
+		vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
+		
 		oscillator.stop();
-  //  lfo.stop();
-
+		
 		oscillator.disconnect(vcf);
 
 		oscillator.disconnect(gainNode);
-    //delete lfo
-		delete oscillator
+    	
+		delete oscillator;
 		state="stopped";
 		start_button.innerHTML="Start Audio";
 	}
@@ -152,6 +168,20 @@ vcf_button.addEventListener('click',function(){
     document.getElementById("slider_peak").style.visibility = "hidden";
 	}
 
+},false);
+
+var connected_lfo=0;
+lfo_button.addEventListener('click',function(){
+	if(connected_lfo===0){
+		connected_lfo=1;
+		lfo_button.style.backgroundColor='#417bcc'
+		lfo_button.innerHTML="LFO OFF";
+	}else{
+		connected_lfo=0;
+		lfo_button.style.backgroundColor='white'
+		lfo_button.innerHTML="LFO ON";
+		typeLFO=0;
+	}
 },false);
 
 function changeType(type){

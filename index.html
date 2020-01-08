@@ -48,6 +48,17 @@
 			<p><label for="peak">Peak : </label><span id="peak_value">1</span></p>
 			<p><input type="range" id="peak" min="0.0001" max="1000"  oninput="changePeak(value)" value="1" class="slider"></p>
 		</div>
+		<button class="lfo" id="lfo">LFO ON</button>
+		<div class="lfo-type">
+				<p>
+			<input type="radio" name="ir" value="0" class="effect" 
+			onclick="changeLFOtype('Tremolo')">Tremolo</input>
+			<input type="radio" name="ir" value="1" class="effect"
+			onclick="changeLFOtype('Vibrato')">Vibrato</input>
+			<input type="radio" name="ir" value="2" class="effect"
+			onclick="changeLFOtype('Wah Wah')">Wah wah</input>
+			</p>
+		</div>
 
 		<script src="audio.js"></script>
 	</body>
