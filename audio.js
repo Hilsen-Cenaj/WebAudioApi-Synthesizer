@@ -58,10 +58,11 @@ function keyDown(event){
 function keyUp(event){
 	const note=(event.detail || event.which).toString();
 	if(activeNotes[note] && keyboardFrequencyMap[note]){
+    vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
 		activeNotes[note].stop();
 		activeNotes[note].disconnect(vcf);
 		activeNotes[note].disconnect(gainNode);
-    	
+
 		delete activeNotes[note];
 	}
 }
@@ -74,7 +75,6 @@ function playNote(note){
 	activeNotes[note]=osc;
 	activeNotes[note].connect(gainNode);
 	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
-
 	activeNotes[note].start();
 
 }
@@ -96,21 +96,38 @@ function audioSetup() {
 };
 
 function changeLFOtype(type){
+  if(typeLFO!=0){
+    if(typeLFO===2){
+      gainNode.disconnect(oscillator.detune);
+    }
+    lfo.stop();
+    lfo.disconnect();
+    delete lfo;
+  }
 	if(type==="Tremolo"){
 		typeLFO=1;
-		tremolo();
 	}else if(type==="Vibrato"){
 		typeLFO=2;
-		if(oscillator){
-			vibrato(oscillator);
-		}
-		if(osc){
-			vibrato(osc);
-		}
 	}else if(type==="Wah Wah"){
 		typeLFO=3;
 	}
-	
+  if(typeLFO!=0){
+
+      lfo=myAudioContext.createOscillator();
+      if(typeLFO===1){
+    		lfo.frequency.value=5;
+        lfo.connect(gainNode.gain);
+    	}else if(typeLFO===2){
+        if(state==="playing"){
+          gainNode.connect(oscillator.detune);
+        }
+    		lfo.frequency.value=2;
+        lfo.connect(gainNode);
+    	}
+
+      lfo.start();
+
+  }
 }
 
 
@@ -122,29 +139,32 @@ start_button.addEventListener('click', function() {
 		 myAudioContext.resume();
 	 }
 	if(state==="stopped"){
-		
+
 		oscillator = myAudioContext.createOscillator();
 		oscillator.type = typeOscillator;
-		
+
 		oscillator.start();
-    	
+
 		oscillator.connect(vcf);
 		oscillator.connect(gainNode);
 
 		start_button.innerHTML="Stop Audio";
 		state="playing";
+    lfo_button.disabled=false;
 	}else{
 		vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
-		
+
 		oscillator.stop();
-		
+
 		oscillator.disconnect(vcf);
 
 		oscillator.disconnect(gainNode);
-    	
+
 		delete oscillator;
 		state="stopped";
+
 		start_button.innerHTML="Start Audio";
+
 	}
 },false);
 
@@ -173,13 +193,24 @@ vcf_button.addEventListener('click',function(){
 var connected_lfo=0;
 lfo_button.addEventListener('click',function(){
 	if(connected_lfo===0){
+
+    document.getElementById('tr').checked=true;
+    document.getElementById('vib').disabled=false;
+    document.getElementById('tr').disabled=false;
+    changeLFOtype('Tremolo')
 		connected_lfo=1;
+
+    document.getElementById('lfo_type').disabled=false;
 		lfo_button.style.backgroundColor='#417bcc'
 		lfo_button.innerHTML="LFO OFF";
 	}else{
-		connected_lfo=0;
+    lfo.stop();
+    connected_lfo=0;
 		lfo_button.style.backgroundColor='white'
 		lfo_button.innerHTML="LFO ON";
+    document.getElementById('tr').checked=true;
+    document.getElementById('vib').disabled=true;
+    document.getElementById('tr').disabled=true;
 		typeLFO=0;
 	}
 },false);
