@@ -30,14 +30,25 @@
 			</p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="volume">Volume</label></p>
-			<p><input type="range" id="volume" min="0" max="100" class="slider"></p>
+			<p><label for="volume">Volume : </label><span id="vol_value">50</span></p>
+			<p><input type="range" id="volume" min="0" max="100" class="slider" ></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="frequency">Frequency</label></p>
-			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" class="slider"></p>
+			<p><label for="frequency">Frequency : </label><span id="freq_value">500</span></p>
+			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" value="500"class="slider"></p>
 
 		</div>
+
+		<button class="vcf" id="vcf">VCF ON</button>
+		<div class = "slidercontainer" id="slider_cutoff" style="visibility: hidden">
+			<p><label for="cutoff">Cutoff : </label><span id="cutoff_value">100</span></p>
+			<p><input type="range" id="cutoff" min="0" max="3000" step="1" oninput="changeCutOff(value)" value="100" class="slider"></p>
+		</div>
+		<div class = "slidercontainer" id="slider_peak" style="visibility: hidden">
+			<p><label for="peak">Peak : </label><span id="peak_value">1</span></p>
+			<p><input type="range" id="peak" min="0.0001" max="1000"  oninput="changePeak(value)" value="1" class="slider"></p>
+		</div>
+
 		<script src="audio.js"></script>
 	</body>
 </html>

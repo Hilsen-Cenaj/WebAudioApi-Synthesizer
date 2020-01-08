@@ -4,9 +4,14 @@
 const volumeButton = document.getElementById('volume');
 const start_button = document.getElementById('start');
 const frequency_value = document.getElementById('frequency');
-
+const volume_text=document.getElementById('vol_value');
+const freq_text=document.getElementById('freq_value');
+const cutoff_text=document.getElementById('cutoff_value');
+const peak_text=document.getElementById('peak_value');
+const vcf_button=document.getElementById('vcf');
 var myAudioContext;
-var oscillator,gainNode,analyser,vcf,vca;
+
+var oscillator,gainNode,analyser,vcf,vca,lfo,osc;
 var state="stopped";
 var typeOscillator='triangle';
 var activeNotes={};
@@ -53,30 +58,44 @@ function keyUp(event){
 	const note=(event.detail || event.which).toString();
 	if(activeNotes[note] && keyboardFrequencyMap[note]){
 		activeNotes[note].stop();
+		activeNotes[note].disconnect(vcf);
+		activeNotes[note].disconnect(gainNode);
+    //lfo.stop();
+    //delete lfo;
 		delete activeNotes[note];
 	}
 }
 
 function playNote(note){
-	var osc=myAudioContext.createOscillator();
+  lfo=myAudioContext.createOscillator();
+  //lfo.connect(gainNode.gain);
+	osc=myAudioContext.createOscillator();
 	osc.type=typeOscillator;
+	osc.connect(vcf);
+  //lfo.frequency.setValueAtTime(5,myAudioContext.currentTime);
 	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
 	activeNotes[note]=osc;
 	activeNotes[note].connect(gainNode);
 	activeNotes[note].start();
-
-
+  //lfo.start();
 }
+
 function audioSetup() {
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+
 	gainNode = myAudioContext.createGain();
+
 	analyser = myAudioContext.createAnalyser();
 	vcf=myAudioContext.createBiquadFilter();
+	vcf.type="lowpass"
+
 	vca=myAudioContext.createGain();
+
 	gainNode.connect(analyser);
 	analyser.connect(myAudioContext.destination);
 
 };
+
 
 // ========================================================
 // Start/Stop Button
@@ -86,21 +105,54 @@ start_button.addEventListener('click', function() {
 		 myAudioContext.resume();
 	 }
 	if(state==="stopped"){
+    lfo=myAudioContext.createOscillator();
+    //lfo.connect(gainNode.gain);
 		oscillator = myAudioContext.createOscillator();
 		oscillator.type = typeOscillator;
+    //lfo.frequency.setValueAtTime(1,myAudioContext.currentTime);
 		oscillator.start();
+    //lfo.start();
+		oscillator.connect(vcf);
 		oscillator.connect(gainNode);
+
 		start_button.innerHTML="Stop Audio";
 		state="playing";
 	}else{
+    vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
 		oscillator.stop();
+  //  lfo.stop();
+
+		oscillator.disconnect(vcf);
+
+		oscillator.disconnect(gainNode);
+    //delete lfo
 		delete oscillator
 		state="stopped";
 		start_button.innerHTML="Start Audio";
 	}
 },false);
 
+var connected_vcf=0;
+vcf_button.addEventListener('click',function(){
+	if(connected_vcf===0){
+		vcf.connect(gainNode);
 
+		connected_vcf=1;
+		vcf_button.style.backgroundColor='#417bcc'
+    vcf_button.innerHTML="VCF OFF"
+    document.getElementById("slider_cutoff").style.visibility = "visible";
+    document.getElementById("slider_peak").style.visibility = "visible";
+	}else{
+		vcf.disconnect(gainNode);
+
+		connected_vcf=0;
+    vcf_button.style.backgroundColor='white'
+    vcf_button.innerHTML="VCF ON"
+    document.getElementById("slider_cutoff").style.visibility = "hidden";
+    document.getElementById("slider_peak").style.visibility = "hidden";
+	}
+
+},false);
 
 function changeType(type){
 	typeOscillator=type;
@@ -110,9 +162,25 @@ function changeType(type){
 }
 
  function changeFrequency(frequency){
-	 oscillator.frequency.value=frequency;
-	 frequency_value.innerHTML=frequency;
- }
+   freq_text.innerHTML=frequency;
+   if(oscillator){
+	    oscillator.frequency.value=frequency;
+  }
+}
+  function changeCutOff(cutoff){
+    cutoff_text.innerHTML=cutoff;
+    if(connected_vcf===1){
+      vcf.frequency.setValueAtTime(cutoff, myAudioContext.currentTime);
+    }
+  }
+
+  function changePeak(peak){
+    peak_text.innerHTML=peak;
+    if(connected_vcf===1){
+      vcf.Q.setValueAtTime(peak, myAudioContext.currentTime);
+    }
+  }
+
 audioSetup();
 
 // ========================================================
@@ -120,6 +188,7 @@ audioSetup();
 // ========================================================
 volumeButton.addEventListener('input',function(){
 	gainNode.gain.value=this.value/100;
+  volume_text.innerHTML=this.value;
 },false);
 
 // ========================================================
