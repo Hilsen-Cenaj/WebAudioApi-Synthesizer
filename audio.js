@@ -21,10 +21,10 @@ var oscillator,gainNode,analyser,vcf,vca,lfo,osc, adsr;
 var state="stopped";
 var typeOscillator='triangle';
 var activeNotes={};
-var attackTime, decayTime, sustainLevel, releaseTime;
 
-
-//KEYCODE TO MUSICAL FREQUENCY CONVERSION
+// ========================================================
+// KEYCODE TO MUSICAL FREQUENCY CONVERSION
+// ========================================================
   const keyboardFrequencyMap = {
     '90': 261.625565300598634,  //Z - C
     '83': 277.182630976872096, //S - C#
@@ -74,7 +74,6 @@ function keyUp(event){
 }
 
 function playNote(note){
-
 	osc=myAudioContext.createOscillator();
 	osc.type=typeOscillator;
 	osc.connect(vcf);
@@ -85,24 +84,29 @@ function playNote(note){
 
 }
 
+// ========================================================
+// CREATE AUDIO SETUP
+// ========================================================
 function audioSetup() {
 	myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 	gainNode = myAudioContext.createGain();
 
 	analyser = myAudioContext.createAnalyser();
+	
 	vcf=myAudioContext.createBiquadFilter();
 	vcf.type="lowpass"
 
 	vca=myAudioContext.createGain();
 
 	gainNode.connect(analyser);
-	analyser.connect(myAudioContext.destination);
-	
-	
+	analyser.connect(myAudioContext.destination);	
 
 };
 
+// ========================================================
+// LFO Types (Tremolo, Vibrato)
+// ========================================================
 function changeLFOtype(type){
   if(typeLFO!=0){
     if(typeLFO===2){
@@ -159,12 +163,6 @@ start_button.addEventListener('click', function() {
 		oscillator.connect(adsr);
 		adsr.connect(myAudioContext.destination);
 		
-		/*
-		const t0 = myAudioContext.currentTime;
-		oscillator.start(t0);
-		// vol:0
-		adsr.gain.setValueAtTime(0, t0);
-		*/
 		// attack
 		const t1 = attack_slider.value;
 		adsr.gain.linearRampToValueAtTime(1, t1);
@@ -177,6 +175,7 @@ start_button.addEventListener('click', function() {
 
 		start_button.innerHTML="Stop Audio";
 		state="playing";
+		
     lfo_button.disabled=false;
 	}else{
 		vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
@@ -193,8 +192,6 @@ start_button.addEventListener('click', function() {
 			}
 		}, 10);
 		//-----------------------------------------//
-		
-		//oscillator.stop();
 
 		oscillator.disconnect(vcf);
 
@@ -208,6 +205,9 @@ start_button.addEventListener('click', function() {
 	}
 },false);
 
+// ========================================================
+// VCF Button On/Off
+// ========================================================
 var connected_vcf=0;
 vcf_button.addEventListener('click',function(){
 	if(connected_vcf===0){
@@ -230,6 +230,9 @@ vcf_button.addEventListener('click',function(){
 
 },false);
 
+// ========================================================
+// LFO Button On/Off
+// ========================================================
 var connected_lfo=0;
 lfo_button.addEventListener('click',function(){
 	if(connected_lfo===0){
@@ -255,6 +258,9 @@ lfo_button.addEventListener('click',function(){
 	}
 },false);
 
+// ========================================================
+// Change OCILLARATOR Type (Sine, Square, Sawtooth, Triangle)
+// ========================================================
 function changeType(type){
 	typeOscillator=type;
 	if(oscillator){
@@ -262,43 +268,50 @@ function changeType(type){
 	}
 }
 
- function changeFrequency(frequency){
-   freq_text.innerHTML=frequency;
-   if(oscillator){
-	    oscillator.frequency.value=frequency;
-  }
+// ========================================================
+// Frequency Slider
+// ========================================================
+function changeFrequency(frequency){
+	freq_text.innerHTML=frequency;
+	if(oscillator){
+		oscillator.frequency.value=frequency;
+	}
 }
-  function changeCutOff(cutoff){
-    cutoff_text.innerHTML=cutoff;
-    if(connected_vcf===1){
-      vcf.frequency.setValueAtTime(cutoff, myAudioContext.currentTime);
-    }
-  }
 
-  function changePeak(peak){
-    peak_text.innerHTML=peak;
-    if(connected_vcf===1){
-      vcf.Q.setValueAtTime(peak, myAudioContext.currentTime);
-    }
-  }
+// ========================================================
+// CutOff Hidden Slider
+// ========================================================
+function changeCutOff(cutoff){
+	cutoff_text.innerHTML=cutoff;
+	if(connected_vcf===1){
+		vcf.frequency.setValueAtTime(cutoff, myAudioContext.currentTime);
+	}
+}
 
+// ========================================================
+// Peak Hidden Slider
+// ========================================================
+function changePeak(peak){
+	peak_text.innerHTML=peak;
+	if(connected_vcf===1){
+		vcf.Q.setValueAtTime(peak, myAudioContext.currentTime);
+	}
+}
+
+// Execute AUDIO SETUP
 audioSetup();
-
-
-
 
 // ========================================================
 // Volume Bar
 // ========================================================
 volumeButton.addEventListener('input',function(){
 	gainNode.gain.value=this.value/100;
-  volume_text.innerHTML=this.value;
+	volume_text.innerHTML=this.value;
 },false);
 
 // ========================================================
 // Create Wave Form
 // ========================================================
-
 var canvas = document.querySelector('.visualizer');
 var myCanvas = canvas.getContext("2d");
 analyser.fftSize = 1024;
@@ -307,14 +320,13 @@ const waveform = new Float32Array(analyser.frequencyBinCount);
 analyser.getFloatTimeDomainData(waveform);
 
 function updateWaveForm() {
-  requestAnimationFrame(updateWaveForm);
-  analyser.getFloatTimeDomainData(waveform);
+	requestAnimationFrame(updateWaveForm);
+	analyser.getFloatTimeDomainData(waveform);
 }
 
 // ========================================================
 // Draw Oscilloscope
 // ========================================================
-
 function drawOscilloscope() {
 	requestAnimationFrame(drawOscilloscope);
 
