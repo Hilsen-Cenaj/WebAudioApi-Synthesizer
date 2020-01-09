@@ -10,12 +10,18 @@ const cutoff_text=document.getElementById('cutoff_value');
 const peak_text=document.getElementById('peak_value');
 const vcf_button=document.getElementById('vcf');
 const lfo_button=document.getElementById('lfo');
+const attack_slider = document.getElementById('attack_slider');
+const decay_slider=document.getElementById('decay_slider');
+const sustain_slider=document.getElementById('sustain_slider');
+const release_slider=document.getElementById('release_slider');
+
 var myAudioContext;
 var typeLFO=0;//1->Tremolo,2->Vibrato,3->Wah,wah
-var oscillator,gainNode,analyser,vcf,vca,lfo,osc;
+var oscillator,gainNode,analyser,vcf,vca,lfo,osc, adsr;
 var state="stopped";
 var typeOscillator='triangle';
 var activeNotes={};
+var attackTime, decayTime, sustainLevel, releaseTime;
 
 
 //KEYCODE TO MUSICAL FREQUENCY CONVERSION
@@ -92,6 +98,8 @@ function audioSetup() {
 
 	gainNode.connect(analyser);
 	analyser.connect(myAudioContext.destination);
+	
+	
 
 };
 
@@ -146,6 +154,25 @@ start_button.addEventListener('click', function() {
 		oscillator.start();
 
 		oscillator.connect(vcf);
+		//------------------ADSR-----------------------//
+		adsr = myAudioContext.createGain();
+		oscillator.connect(adsr);
+		adsr.connect(myAudioContext.destination);
+		
+		/*
+		const t0 = myAudioContext.currentTime;
+		oscillator.start(t0);
+		// vol:0
+		adsr.gain.setValueAtTime(0, t0);
+		*/
+		// attack
+		const t1 = attack_slider.value;
+		adsr.gain.linearRampToValueAtTime(1, t1);
+		// decay
+		const t2 = decay_slider.value;
+		adsr.gain.setTargetAtTime(sustain_slider.value, t1, t2);
+		//--------------------------------------------//
+		
 		oscillator.connect(gainNode);
 
 		start_button.innerHTML="Stop Audio";
@@ -153,8 +180,21 @@ start_button.addEventListener('click', function() {
     lfo_button.disabled=false;
 	}else{
 		vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
+		
+		//------------------ADSR-----------------------//
+		const t = myAudioContext.currentTime;
+		adsr.gain.cancelScheduledValues(t);
+		adsr.gain.setValueAtTime(adsr.gain.value, t);
+		adsr.gain.setTargetAtTime(0, t, release_slider.value);
 
-		oscillator.stop();
+		const stop = setInterval(() => {
+			if (adsr.gain.value < 0.01) {
+				oscillator.stop();
+			}
+		}, 10);
+		//-----------------------------------------//
+		
+		//oscillator.stop();
 
 		oscillator.disconnect(vcf);
 
@@ -243,6 +283,9 @@ function changeType(type){
   }
 
 audioSetup();
+
+
+
 
 // ========================================================
 // Volume Bar
