@@ -11,9 +11,13 @@ const peak_text=document.getElementById('peak_value');
 const vcf_button=document.getElementById('vcf');
 const lfo_button=document.getElementById('lfo');
 const attack_slider = document.getElementById('attack_slider');
+const attack_text = document.getElementById('attack_value');
 const decay_slider=document.getElementById('decay_slider');
+const decay_text = document.getElementById('decay_value');
 const sustain_slider=document.getElementById('sustain_slider');
+const sustain_text = document.getElementById('sustain_value');
 const release_slider=document.getElementById('release_slider');
+const release_text = document.getElementById('release_value');
 
 var myAudioContext;
 var typeLFO=0;//1->Tremolo,2->Vibrato,3->Wah,wah
@@ -166,6 +170,7 @@ start_button.addEventListener('click', function() {
 		adsr.gain.setValueAtTime(0, t0);
 		*/
 		// attack
+		
 		const t1 = attack_slider.value;
 		adsr.gain.linearRampToValueAtTime(1, t1);
 		// decay
@@ -295,6 +300,22 @@ volumeButton.addEventListener('input',function(){
   volume_text.innerHTML=this.value;
 },false);
 
+attack_slider.addEventListener('input',function(){
+	
+  attack_text.innerHTML=this.value;
+},false);
+decay_slider.addEventListener('input',function(){
+	
+  decay_text.innerHTML=this.value;
+},false);
+sustain_slider.addEventListener('input',function(){
+	
+  sustain_text.innerHTML=this.value;
+},false);
+release_slider.addEventListener('input',function(){
+	
+  release_text.innerHTML=this.value;
+},false);
 // ========================================================
 // Create Wave Form
 // ========================================================

@@ -30,35 +30,54 @@
 			</p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="volume">Volume</label></p>
-			<p><input type="range" id="volume" min="0" max="100" class="slider"></p>
+			<p><label for="volume">Volume : </label><span id="vol_value">50</span></p>
+			<p><input type="range" id="volume" min="0" max="100" class="slider" ></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="frequency">Frequency</label></p>
-			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" class="slider"></p>
+			<p><label for="frequency">Frequency : </label><span id="freq_value">500</span></p>
+			<p><input type="range" id="frequency" min="0" max="1000" step="1" oninput="changeFrequency(value)" value="500"class="slider"></p>
 
+		</div>
+
+		<button class="vcf" id="vcf">VCF ON</button>
+		<div class = "slidercontainer" id="slider_cutoff" style="visibility: hidden">
+			<p><label for="cutoff">Cutoff : </label><span id="cutoff_value">100</span></p>
+			<p><input type="range" id="cutoff" min="0" max="3000" step="1" oninput="changeCutOff(value)" value="100" class="slider"></p>
+		</div>
+		<div class = "slidercontainer" id="slider_peak" style="visibility: hidden">
+			<p><label for="peak">Peak : </label><span id="peak_value">1</span></p>
+			<p><input type="range" id="peak" min="0.0001" max="1000"  oninput="changePeak(value)" value="1" class="slider"></p>
+		</div>
+		<button class="lfo" id="lfo">LFO ON</button>
+		<div class="lfo-type" id="lfo_type">
+				<p>
+			<input type="radio" id='tr' name="ir" value="0" class="effect"
+			onclick="changeLFOtype('Tremolo')" disabled>Tremolo</input>
+			<input type="radio" name="ir" id="vib" value="1" class="effect"
+			onclick="changeLFOtype('Vibrato')"disabled >Vibrato</input>
+
+			</p>
+		</div>
+		
+		<h3>ADSR envelope</h3>
+		<div class = "slidercontainer">
+		
+			<p><label for="attack">Attack</label><span id="attack_value"> 0.5</span></p>
+			<p><input type="range" id="attack_slider" min="0" max="1" step="0.01" class="slider" ></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="attack">Attack</label></p>
-			<p><input type="range" id="attack" min="0" max="100" step="2" oninput="changeattack(value)" class="slider"></p>
-
+			<p><label for="decay">Decay</label><span id="decay_value"> 0.5</span></p>
+			<p><input type="range" id="decay_slider" min="0" max="1" step="0.01" class="slider" ></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="decay">Decay</label></p>
-			<p><input type="range" id="decay" min="0" max="100" step="3" oninput="changedecay(value)" class="slider"></p>
-
+			<p><label for="sustain">Sustain</label><span id="sustain_value"> 0.5</span></p>
+			<p><input type="range" id="sustain_slider" min="0" max="1" step="0.01" class="slider" ></p>
 		</div>
 		<div class = "slidercontainer">
-			<p><label for="sustain">Sustain</label></p>
-			<p><input type="range" id="sustain" min="0" max="100" step="4" oninput="changesustain(value)" class="slider"></p>
-
+			<p><label for="release">Release</label><span id="release_value"> 0.5</span></p>
+			<p><input type="range" id="release_slider" min="0" max="1" step="0.01" class="slider" ></p>
 		</div>
-		<div class = "slidercontainer">
-			<p><label for="release">Release</label></p>
-			<p><input type="range" id="release" min="0" max="100" step="5" oninput="changerelease(value)" class="slider"></p>
 
-		</div>
-		<button class="audio-btn" id="adsr">Start</button>
 		<script src="audio.js"></script>
 	</body>
 </html>
