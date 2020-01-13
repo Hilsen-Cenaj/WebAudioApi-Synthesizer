@@ -16,7 +16,7 @@ const sustain_slider=document.getElementById('sustain_slider');
 const release_slider=document.getElementById('release_slider');
 
 var myAudioContext;
-var typeLFO=0;//1->Tremolo,2->Vibrato,3->Wah,wah
+var typeLFO=0;//1->Tremolo,2->Vibrato
 var oscillator,gainNode,analyser,vcf,vca,lfo,osc, adsr;
 var state="stopped";
 var typeOscillator='triangle';
@@ -68,7 +68,7 @@ function keyUp(event){
 		activeNotes[note].stop();
 		activeNotes[note].disconnect(vcf);
 		activeNotes[note].disconnect(gainNode);
-
+    activeNotes[note].disconnect(adsr);
 		delete activeNotes[note];
 	}
 }
@@ -78,6 +78,7 @@ function playNote(note){
 	osc.type=typeOscillator;
 	osc.connect(vcf);
 	activeNotes[note]=osc;
+  activeNotes[note].connect(adsr);
 	activeNotes[note].connect(gainNode);
 	osc.frequency.setValueAtTime(keyboardFrequencyMap[note],myAudioContext.currentTime);
 	activeNotes[note].start();
@@ -93,14 +94,14 @@ function audioSetup() {
 	gainNode = myAudioContext.createGain();
 
 	analyser = myAudioContext.createAnalyser();
-	
+
 	vcf=myAudioContext.createBiquadFilter();
 	vcf.type="lowpass"
+	adsr = myAudioContext.createGain();
 
-	vca=myAudioContext.createGain();
 
 	gainNode.connect(analyser);
-	analyser.connect(myAudioContext.destination);	
+	analyser.connect(myAudioContext.destination);
 
 };
 
@@ -111,6 +112,7 @@ function changeLFOtype(type){
   if(typeLFO!=0){
     if(typeLFO===2){
       gainNode.disconnect(oscillator.detune);
+
     }
     lfo.stop();
     lfo.disconnect();
@@ -120,21 +122,22 @@ function changeLFOtype(type){
 		typeLFO=1;
 	}else if(type==="Vibrato"){
 		typeLFO=2;
-	}else if(type==="Wah Wah"){
-		typeLFO=3;
-	}
+  }
   if(typeLFO!=0){
 
       lfo=myAudioContext.createOscillator();
       if(typeLFO===1){
     		lfo.frequency.value=5;
         lfo.connect(gainNode.gain);
+
     	}else if(typeLFO===2){
         if(state==="playing"){
           gainNode.connect(oscillator.detune);
+
         }
     		lfo.frequency.value=2;
         lfo.connect(gainNode);
+
     	}
 
       lfo.start();
@@ -159,10 +162,10 @@ start_button.addEventListener('click', function() {
 
 		oscillator.connect(vcf);
 		//------------------ADSR-----------------------//
-		adsr = myAudioContext.createGain();
+
 		oscillator.connect(adsr);
-		adsr.connect(myAudioContext.destination);
-		
+
+		adsr.connect(gainNode);
 		// attack
 		const t1 = attack_slider.value;
 		adsr.gain.linearRampToValueAtTime(1, t1);
@@ -170,16 +173,16 @@ start_button.addEventListener('click', function() {
 		const t2 = decay_slider.value;
 		adsr.gain.setTargetAtTime(sustain_slider.value, t1, t2);
 		//--------------------------------------------//
-		
+
 		oscillator.connect(gainNode);
 
 		start_button.innerHTML="Stop Audio";
 		state="playing";
-		
+
     lfo_button.disabled=false;
 	}else{
 		vcf.Q.setValueAtTime(0.0001, myAudioContext.currentTime);
-		
+
 		//------------------ADSR-----------------------//
 		const t = myAudioContext.currentTime;
 		adsr.gain.cancelScheduledValues(t);
@@ -305,7 +308,8 @@ audioSetup();
 // Volume Bar
 // ========================================================
 volumeButton.addEventListener('input',function(){
-	gainNode.gain.value=this.value/100;
+	gainNode.gain.setValueAtTime(this.value/100, myAudioContext.currentTime);
+	adsr.gain.setValueAtTime(this.value/100, myAudioContext.currentTime);
 	volume_text.innerHTML=this.value;
 },false);
 
